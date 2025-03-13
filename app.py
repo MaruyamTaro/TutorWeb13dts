@@ -28,11 +28,11 @@ def render_homepage():
 def render_menu():
     return render_template('Schedule.html')
 
-@app.route('/signup')
+@app.route('/signup', methods=['POST','GET'])
 def render_signup():
     return render_template('signup.html')
 
-@app.route('/login')
+@app.route('/login', methods=['POST','GET'])
 def render_login():
     return render_template('login.html')
 
