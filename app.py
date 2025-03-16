@@ -27,43 +27,50 @@ def render_homepage():
 @app.route('/Schedule')
 def render_schedule():
     con = connect_database(DATABASE)
-    query = ("SELECT Teacher_f_name, Student_f_name, Time FROM TimeTable")
+    query = "SELECT Teacher_f_name, Student_f_name FROM TimeTable"
     cur = con.cursor()
     cur.execute(query)
     results = cur.fetchall()
     print(results)
     con.close()
-    return render_template('menu.html', sessions=results)
-
-
+    return render_template('Schedule.html', Sessions=results)
 
 
 
 
 
 @app.route('/signup', methods=['POST','GET'])
-
 def render_signup():
     if request.method == 'POST':
-        fname = request.form.get('user_F_name').title().strip()
-        lname = request.form.get('user_L_name').title().strip()
-        email = request.form.get('user_email').lower().strip()
-        pass1 = request.form.get('user_password')
-        pass2 = request.form.get('user_password2')
-        teachquestion = request.form.get('teachquestion')
+        try:
+            fname = request.form.get('user_F_name')
+            lname = request.form.get('user_L_name')
+            email = request.form.get('user_email')
+            pass1 = request.form.get('user_password')
+            pass2 = request.form.get('user_password2')
+            teachquestion = request.form.get('teachquestion')
+
+            if pass1 != pass2:
+                return redirect("/signup?error=passwords+do+not+match")
+            if len(pass1) < 8:
+                return redirect("/signup?error=password+must+be+more+than+8+letters")
+
+            con = connect_database(DATABASE)
+            query_insert = ("INSERT INTO People (First_name, Last_name, Email, password, Teacher) "
+                            "VALUES (?, ?, ?, ?, ?)")
+            cur = con.cursor()
+            cur.execute(query_insert, (fname, lname, email, pass1, teachquestion))
+            con.commit()
 
 
-        if pass1 != pass2:
-            return redirect("\signup?error=passwords+do+not+match")
+            return redirect("/login?message=signup+successful")
 
-        if len(pass1) < 8:
-            return redirect("\signup?error=password+must+be+more+than+8+letters")
+        except Exception as e:
+            print(f"Signup error: {str(e)}")
+            return redirect("/signup?error=registration+failed")
 
-        con = connect_database(DATABASE)
-        query_insert = ("INSERT INTO People (First_name, Last_name, Email, password, Teacher) "
-                        "VALUES (fname, lname, email, pass1, teachquestion)")
-        cur = con.cursor()
-        cur.execute(query_insert, (fname, lname, email, pass1, teachquestion))
+    # If it's a GET request, render the signup form
+    return render_template("signup.html")
 @app.route('/login', methods=['POST','GET'])
 def render_login():
     return render_template('login.html')
