@@ -6,5 +6,13 @@ menu
 {% endblock %}
 
 {% block main %}
+   <div class="products">
+        {% for session in sessions %}
+            <div class="product-box">
+                <h3 class = product-box-heading> {{ session[0] }}</h3>
+                <p class="product-box-info"> {{ coffee[1] }}</p>
 
+            </div>
+        {%endfor%}
+   </div>
 {% endblock %}
