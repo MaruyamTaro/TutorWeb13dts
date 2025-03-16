@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, redirect
 import sqlite3
 from sqlite3 import Error
 
-DATABASE = "DB.db"
+DATABASE = "C:/Users/21300/PycharmProjects/TutorWeb13dts/DB"
+
 app = Flask(__name__)
 def connect_database(db_file):
     """
@@ -41,7 +42,9 @@ def render_schedule():
 
 @app.route('/signup', methods=['POST','GET'])
 def render_signup():
+
     if request.method == 'POST':
+
         try:
             fname = request.form.get('user_F_name')
             lname = request.form.get('user_L_name')
@@ -49,7 +52,8 @@ def render_signup():
             pass1 = request.form.get('user_password')
             pass2 = request.form.get('user_password2')
             teachquestion = request.form.get('teachquestion')
-
+            print("flag1")
+            print(fname)
             if pass1 != pass2:
                 return redirect("/signup?error=passwords+do+not+match")
             if len(pass1) < 8:
@@ -58,8 +62,12 @@ def render_signup():
             con = connect_database(DATABASE)
             query_insert = ("INSERT INTO People (First_name, Last_name, Email, password, Teacher) "
                             "VALUES (?, ?, ?, ?, ?)")
+            query_test = "SELECT * FROM People"
             cur = con.cursor()
             cur.execute(query_insert, (fname, lname, email, pass1, teachquestion))
+            cur.execute(query_test)
+            test_store = cur.fetchall()
+            print(test_store)
             con.commit()
 
 
