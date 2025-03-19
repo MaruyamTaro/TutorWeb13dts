@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 import sqlite3
 from sqlite3 import Error
 
 DATABASE = "C:/Users/21300/PycharmProjects/TutorWeb13dts/DB"
 
 app = Flask(__name__)
+app.secret_key = "abcdef"
 def connect_database(db_file):
     """
     Creates a connection with the database
@@ -80,7 +81,24 @@ def render_signup():
     # If it's a GET request, render the signup form
     return render_template("signup.html")
 @app.route('/login', methods=['POST','GET'])
+
 def render_login():
+    if request.method == 'POST':
+        email = request.form.get('user_email')
+        password = request.form.get('user_password')
+
+        con = connect_database(DATABASE)
+        cur = con.cursor()
+        query = "SELECT First_name, Last_name, Email, password FROM People WHERE email = ?"
+        cur.execute(query,(email,))
+        results = cur.fetchone()
+        print(results)
+        if password != results[3]:
+            return redirect('/login/?message=Incorrctnameorpassword')
+        session['email'] = results[2]
+        session['first_name'] = results[0]
+        session['last_name'] = results[1]
+
     return render_template('login.html')
 
 
