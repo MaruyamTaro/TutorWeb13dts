@@ -6,6 +6,16 @@ DATABASE = "C:/Users/21300/PycharmProjects/TutorWeb13dts/DB"
 
 app = Flask(__name__)
 app.secret_key = "abcdef"
+
+
+def is_logged_in():
+    if (session["first_name"] == None):
+        print("Not Logged IN")
+        return False
+    else:
+        print("Logged IN")
+        return True
+
 def connect_database(db_file):
     """
     Creates a connection with the database
@@ -83,6 +93,8 @@ def render_signup():
 @app.route('/login', methods=['POST','GET'])
 
 def render_login():
+    if is_logged_in():
+        return redirect('/menu/1')
     if request.method == 'POST':
         email = request.form.get('user_email')
         password = request.form.get('user_password')
@@ -98,7 +110,8 @@ def render_login():
         session['email'] = results[2]
         session['first_name'] = results[0]
         session['last_name'] = results[1]
-
+        print(session)
+        return  redirect("/")
     return render_template('login.html')
 
 
