@@ -17,7 +17,12 @@
         <div class="navbar-links">
             <a href="/">home</a>
             <a href="/Schedule">schedule</a>
-            <a href="/login">login</a>
+            {% if logged_in == True %}
+                <a href="/logout">logout</a>
+
+            {% else %}
+                <a href="/login">login</a>
+            {% endif %}
             <a href="/signup">SignUp</a>
         </div>
     </div>

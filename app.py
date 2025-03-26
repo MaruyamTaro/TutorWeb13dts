@@ -9,7 +9,9 @@ app.secret_key = "abcdef"
 
 
 def is_logged_in():
-    if (session["first_name"] == None):
+    if session.get('first_name') == None:
+        return False
+    if (session['first_name'] == None):
         print("Not Logged IN")
         return False
     else:
@@ -33,7 +35,7 @@ def connect_database(db_file):
 
 @app.route('/')
 def render_homepage():
-    return render_template('home.html')
+    return render_template('home.html', logged_in = is_logged_in())
 
 
 @app.route('/Schedule')
@@ -89,12 +91,13 @@ def render_signup():
             return redirect("/signup?error=registration+failed")
 
     # If it's a GET request, render the signup form
-    return render_template("signup.html")
-@app.route('/login', methods=['POST','GET'])
+    return render_template("signup.html", logged_in = is_logged_in())
 
+
+@app.route('/login', methods=['POST','GET'])
 def render_login():
     if is_logged_in():
-        return redirect('/menu/1')
+        return redirect('/')
     if request.method == 'POST':
         email = request.form.get('user_email')
         password = request.form.get('user_password')
@@ -104,18 +107,21 @@ def render_login():
         query = "SELECT First_name, Last_name, Email, password FROM People WHERE email = ?"
         cur.execute(query,(email,))
         results = cur.fetchone()
-        print(results)
         if password != results[3]:
             return redirect('/login/?message=Incorrctnameorpassword')
         session['email'] = results[2]
         session['first_name'] = results[0]
         session['last_name'] = results[1]
         print(session)
-        return  redirect("/")
-    return render_template('login.html')
+        return redirect("/")
+    return render_template('login.html', logged_in = is_logged_in())
 
-
-
+@app.route('/logout', methods=['POST','GET'])
+def logout():
+    print(session)
+    session.clear()
+    print(session)
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run()
